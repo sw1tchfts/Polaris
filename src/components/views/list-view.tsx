@@ -10,11 +10,13 @@ import {
   ArrowDown,
   Minus,
   ChevronRight,
+  Building,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { type Task, type Status, type Priority, statusConfig, priorityConfig } from "@/data/mock";
+import { type Task, type Status, type Priority, statusConfig, priorityConfig, getCommunity } from "@/data/mock";
 
 const statusIcons: Record<Status, React.ElementType> = {
   todo: Circle,
@@ -68,6 +70,7 @@ function TaskRow({ task, onClick }: { task: Task; onClick: () => void }) {
 
   const completedSubtasks = task.subtasks.filter((s) => s.done).length;
   const totalSubtasks = task.subtasks.length;
+  const community = task.communityId ? getCommunity(task.communityId) : null;
 
   return (
     <button
@@ -77,6 +80,18 @@ function TaskRow({ task, onClick }: { task: Task; onClick: () => void }) {
       <StatusIcon className={cn("h-4 w-4 shrink-0", statusColor.replace("bg-", "text-"))} />
 
       <span className="flex-1 truncate text-sm">{task.title}</span>
+
+      {task.scope === "community" && community ? (
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1 shrink-0">
+          <MapPin className="h-2.5 w-2.5" />
+          {community.name.split(" ").pop()}
+        </Badge>
+      ) : (
+        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 gap-1 shrink-0">
+          <Building className="h-2.5 w-2.5" />
+          Company
+        </Badge>
+      )}
 
       {totalSubtasks > 0 && (
         <span className="flex items-center gap-1 text-xs text-muted-foreground">

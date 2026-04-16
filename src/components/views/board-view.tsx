@@ -3,16 +3,14 @@
 import React from "react";
 import {
   CheckCircle2,
-  Circle,
-  Clock,
   AlertCircle,
   ArrowUp,
   ArrowDown,
   Minus,
   MoreHorizontal,
   Plus,
-  MessageSquare,
-  Paperclip,
+  Building,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,14 +23,8 @@ import {
   type Priority,
   statusConfig,
   priorityConfig,
+  getCommunity,
 } from "@/data/mock";
-
-const statusIcons: Record<Status, React.ElementType> = {
-  todo: Circle,
-  "in-progress": Clock,
-  "in-review": AlertCircle,
-  done: CheckCircle2,
-};
 
 const priorityIcons: Record<Priority, React.ElementType> = {
   urgent: AlertCircle,
@@ -101,6 +93,7 @@ function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
   const priorityColor = priorityConfig[task.priority].color;
   const completedSubtasks = task.subtasks.filter((s) => s.done).length;
   const totalSubtasks = task.subtasks.length;
+  const community = task.communityId ? getCommunity(task.communityId) : null;
 
   return (
     <button
@@ -112,15 +105,24 @@ function TaskCard({ task, onClick }: { task: Task; onClick: () => void }) {
         <PriorityIcon className={cn("h-3.5 w-3.5 shrink-0 mt-0.5", priorityColor)} />
       </div>
 
-      {task.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {task.tags.slice(0, 3).map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
-              {tag}
-            </Badge>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap gap-1">
+        {task.scope === "community" && community ? (
+          <Badge variant="outline" className="text-[10px] px-1.5 py-0 gap-1">
+            <MapPin className="h-2.5 w-2.5" />
+            {community.name.split(" ").pop()}
+          </Badge>
+        ) : (
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 gap-1">
+            <Building className="h-2.5 w-2.5" />
+            Company
+          </Badge>
+        )}
+        {task.tags.slice(0, 2).map((tag) => (
+          <Badge key={tag} variant="secondary" className="text-[10px] px-1.5 py-0">
+            {tag}
+          </Badge>
+        ))}
+      </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

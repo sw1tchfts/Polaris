@@ -7,9 +7,6 @@ import {
   Circle,
   Clock,
   AlertCircle,
-  ArrowUp,
-  ArrowDown,
-  Minus,
   Calendar,
   Tag,
   User,
@@ -17,6 +14,8 @@ import {
   Link2,
   Paperclip,
   MessageSquare,
+  Building,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,10 +26,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   type Task,
   type Status,
-  type Priority,
   statusConfig,
   priorityConfig,
   projects,
+  getCommunity,
+  getCompanyForProject,
 } from "@/data/mock";
 
 interface TaskDetailProps {
@@ -49,6 +49,8 @@ export function TaskDetail({ task, onClose }: TaskDetailProps) {
   const StatusIcon = statusIcons[task.status];
   const project = projects.find((p) => p.id === task.project);
   const section = project?.sections.find((s) => s.id === task.section);
+  const company = project ? getCompanyForProject(project.id) : null;
+  const community = task.communityId ? getCommunity(task.communityId) : null;
   const completedSubtasks = task.subtasks.filter((s) => s.done).length;
 
   return (
@@ -58,17 +60,17 @@ export function TaskDetail({ task, onClose }: TaskDetailProps) {
           {project && (
             <>
               <div className={cn("h-2 w-2 rounded-full", project.color)} />
-              <span>{project.name}</span>
+              <span className="truncate">{project.name}</span>
             </>
           )}
           {section && (
             <>
               <span>/</span>
-              <span>{section.name}</span>
+              <span className="truncate">{section.name}</span>
             </>
           )}
         </div>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+        <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={onClose}>
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -94,15 +96,39 @@ export function TaskDetail({ task, onClose }: TaskDetailProps) {
           )}
 
           <div className="mt-6 flex flex-col gap-3">
+            <DetailRow icon={task.scope === "community" ? MapPin : Building} label="Scope">
+              {task.scope === "community" && community ? (
+                <div className="flex flex-col gap-0.5">
+                  <Badge variant="outline" className="text-xs gap-1 w-fit">
+                    <MapPin className="h-3 w-3" />
+                    {community.name}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">
+                    {community.location} &middot; {community.beds} beds
+                  </span>
+                </div>
+              ) : (
+                <Badge variant="secondary" className="text-xs gap-1">
+                  <Building className="h-3 w-3" />
+                  {company ? company.name : "Company-wide"}
+                </Badge>
+              )}
+            </DetailRow>
+
             <DetailRow icon={User} label="Assignee">
               {task.assignee ? (
-                <div className="flex items-center gap-2">
-                  <Avatar className="h-5 w-5">
-                    <AvatarFallback className={cn("text-[8px] text-white", task.assignee.color)}>
-                      {task.assignee.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm">{task.assignee.name}</span>
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-5 w-5">
+                      <AvatarFallback className={cn("text-[8px] text-white", task.assignee.color)}>
+                        {task.assignee.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm">{task.assignee.name}</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {task.assignee.role} &middot; {task.assignee.org}
+                  </span>
                 </div>
               ) : (
                 <span className="text-sm text-muted-foreground">Unassigned</span>
@@ -203,7 +229,7 @@ export function TaskDetail({ task, onClose }: TaskDetailProps) {
             <span className="text-sm font-medium">Activity</span>
             <div className="mt-3 flex gap-3">
               <Avatar className="h-7 w-7 shrink-0">
-                <AvatarFallback className="bg-blue-500 text-[9px] text-white">AC</AvatarFallback>
+                <AvatarFallback className="bg-blue-500 text-[9px] text-white">RT</AvatarFallback>
               </Avatar>
               <div className="flex-1 rounded-lg border border-input bg-muted/30 px-3 py-2">
                 <p className="text-sm text-muted-foreground">Write a comment...</p>
@@ -241,12 +267,12 @@ function DetailRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex w-28 items-center gap-2 text-muted-foreground">
+    <div className="flex items-start gap-3">
+      <div className="flex w-28 items-center gap-2 text-muted-foreground pt-0.5">
         <Icon className="h-3.5 w-3.5" />
         <span className="text-sm">{label}</span>
       </div>
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   );
 }

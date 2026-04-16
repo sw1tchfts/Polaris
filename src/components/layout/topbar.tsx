@@ -1,25 +1,36 @@
 "use client";
 
 import React from "react";
-import { List, LayoutGrid, GanttChart, Calendar, Filter, SortAsc, Plus, Users } from "lucide-react";
+import { List, LayoutGrid, GanttChart, Calendar, Filter, SortAsc, Plus, Users, Building, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface TopbarProps {
   title: string;
   subtitle?: string;
+  scopeLabel?: string;
+  scopeType?: "company" | "community" | null;
   activeTab: string;
   onTabChange: (tab: string) => void;
   onAddTask: () => void;
 }
 
-export function Topbar({ title, subtitle, activeTab, onTabChange, onAddTask }: TopbarProps) {
+export function Topbar({ title, subtitle, scopeLabel, scopeType, activeTab, onTabChange, onAddTask }: TopbarProps) {
   return (
     <div className="flex flex-col border-b border-border bg-background">
       <div className="flex items-center justify-between px-6 pt-4 pb-2">
-        <div>
-          <h1 className="text-lg font-semibold">{title}</h1>
-          {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-lg font-semibold">{title}</h1>
+            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
+          {scopeLabel && scopeType && (
+            <Badge variant={scopeType === "community" ? "outline" : "secondary"} className="gap-1 text-xs">
+              {scopeType === "community" ? <MapPin className="h-3 w-3" /> : <Building className="h-3 w-3" />}
+              {scopeLabel}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="gap-1.5">
@@ -63,6 +74,13 @@ export function Topbar({ title, subtitle, activeTab, onTabChange, onAddTask }: T
             >
               <Calendar className="h-3.5 w-3.5" />
               Calendar
+            </TabsTrigger>
+            <TabsTrigger
+              value="workgroups"
+              className="gap-1.5 rounded-none border-b-2 border-transparent px-3 py-1.5 data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+            >
+              <Users className="h-3.5 w-3.5" />
+              Workgroups
             </TabsTrigger>
           </TabsList>
         </Tabs>
