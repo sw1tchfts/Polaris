@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import {
   Home,
   Inbox,
@@ -58,13 +59,23 @@ export function Sidebar({ activeView, activeProject, activeCommunity, onNavigate
 
   return (
     <div className="flex h-full w-[280px] flex-col border-r border-sidebar-border bg-sidebar-background">
-      <div className="flex items-center gap-2 px-4 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <FolderKanban className="h-4 w-4 text-primary-foreground" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold">Polaris</span>
-          <span className="text-xs text-muted-foreground">Implementation Hub</span>
+      <div className="flex flex-col items-start gap-2 px-4 py-3">
+        <Image
+          src="/polaris-logo.png"
+          alt="Polaris"
+          width={240}
+          height={240}
+          className="h-auto w-full rounded-md"
+          priority
+        />
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <FolderKanban className="h-4 w-4 text-primary-foreground" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold">Polaris</span>
+            <span className="text-xs text-muted-foreground">Implementation Hub</span>
+          </div>
         </div>
       </div>
 
